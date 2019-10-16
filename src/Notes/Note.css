@@ -4,6 +4,8 @@
   position: relative;
   padding: 1rem;
   margin: 1rem;
+  height: fit-content;
+  list-style: none;
 }
 
 .note > button {
@@ -24,4 +26,7 @@
   text-decoration: none;
   color: black;
   font-weight: 500;
+}
+.note-content {
+  margin-bottom: 2rem;
 }

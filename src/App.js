@@ -10,7 +10,7 @@ import StoreContext from './StoreContext';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import NotesList from './Notes/NotesList';
-// import Note from './Notes/Note';
+import Note from './Notes/Note';
 
 export default class App extends Component {
   constructor() {
@@ -20,12 +20,11 @@ export default class App extends Component {
       notes: [],
     };
   }
+
   // To fetch the notes and folders, you should make two GET requests:
   // http://localhost:9090/folders
   // http://localhost:9090/notes
-
-  // To delete notes, make a DELETE request to the /notes/<note-id> endpoint.
-  componentDidMount() {
+  getData = () => {
     fetch('http://localhost:9090/folders')
       .then(resp => resp.json())
       .then(resp =>
@@ -41,6 +40,31 @@ export default class App extends Component {
           notes: resp,
         })
       );
+  };
+
+  // To delete notes, make a DELETE request to the /notes/<note-id> endpoint.
+  //   fetch(`http://localhost:1234/foo/${fooId}`, {
+  //   method: 'DELETE',
+  //   headers: {
+  //     'content-type': 'application/json'
+  //   },
+  // };
+  handleDelete = id => {
+    fetch(`http://localhost:9090/notes/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'content-type': 'application/json',
+      },
+    })
+      .then(resp => {
+        if (!resp.ok) return resp.json().then(e => Promise.reject(e));
+      })
+      .then(() => this.getData())
+      .catch(e => console.log(e));
+  };
+
+  componentDidMount() {
+    this.getData();
   }
 
   render() {
@@ -49,6 +73,7 @@ export default class App extends Component {
         value={{
           folders: this.state.folders,
           notes: this.state.notes,
+          handleDelete: this.handleDelete,
         }}
       >
         <BrowserRouter>
@@ -69,33 +94,24 @@ export default class App extends Component {
                 path='/folder/:folderid'
                 component={props => (
                   <>
-                    <Sidebar />
+                    <Sidebar folderId={props.match.params.folderid} />
                     <NotesList folderId={props.match.params.folderid} />
                   </>
                 )}
               />
-              {/* <Route
+              <Route
                 path='/note/:noteid'
-                component={props => {
-                  console.log(props);
-                  const note = this.state.notes.find(
-                    x => x.id === props.match.params.noteid
-                  );
-                  return (
-                    <>
-                      <Sidebar
-                        folderName={
-                          this.state.folders.find(x => x.id === note.folderId)
-                            .name
-                        }
-                        history={props.history}
-                      />
-                      <Note full={true} note={note} />
-                    </>
-                  );
-                }}
+                component={props => (
+                  <>
+                    <Sidebar
+                      history={props.history}
+                      noteId={props.match.params.noteid}
+                    />
+                    <Note full={true} noteId={props.match.params.noteid} />
+                  </>
+                )}
               />
-              <Route path='/add_folder' /> */}
+              <Route path='/add_folder' />
             </section>
           </main>
         </BrowserRouter>
@@ -103,10 +119,3 @@ export default class App extends Component {
     );
   }
 }
-
-// App.js .Provider => folders/notes from state
-// Sidebar .Consumer => reqs folders
-// NotesList .Consumer => reqs notes
-//
-//
-//

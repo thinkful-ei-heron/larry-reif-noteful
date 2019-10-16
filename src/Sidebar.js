@@ -11,8 +11,10 @@ export default class Sidebar extends Component {
   static contextType = StoreContext;
 
   render() {
-    const { folders } = this.context;
-    return (
+    const { folders, notes } = this.context;
+    let target = notes.find(item => item.id === this.props.noteId);
+
+    let output = (
       <section id='sidebar-container'>
         {folders.map(item => {
           return (
@@ -31,19 +33,22 @@ export default class Sidebar extends Component {
         })}
       </section>
     );
+
+    if (target) {
+      let folTar = folders.find(item => item.id === target.folderId);
+      output = (
+        <section id='sidebar-container'>
+          <button
+            id='go-back-button'
+            type='button'
+            onClick={this.props.history.goBack}
+          >
+            <h3>Go Back</h3>
+          </button>
+          <h2 id='folder-name-left'>{folTar.name}</h2>
+        </section>
+      );
+    }
+    return <>{output}</>;
   }
 }
-
-// ) : (
-//   <>
-//     <button
-//       id='go-back-button'
-//       type='button'
-//       onClick={this.props.history.goBack}
-//     >
-//       <h3>Go Back</h3>
-//     </button>
-//     <h2 id='folder-name-left'>{this.props.folderName}</h2>
-//   </>
-// );
-// }
