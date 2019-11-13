@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Route } from 'react-router-dom';
 import { BrowserRouter } from 'react-router-dom';
-// import dummyStore from './dummy-store';
 
 import './App.css';
 
@@ -56,8 +55,9 @@ export default class App extends Component {
         'content-type': 'application/json',
       },
     })
-      .then(resp => {
-        if (!resp.ok) return resp.json().then(e => Promise.reject(e));
+      .then((resp, e) => {
+        if (!resp.ok) e = resp.json();
+        return Promise.reject(e);
       })
       .then(() => this.getData())
       .catch(e => console.log(e));
